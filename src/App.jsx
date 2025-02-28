@@ -9,12 +9,14 @@ import Step5 from './pages/Step5';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
+import About from './pages/About';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
         <Route path="/step1" element={<Step1 />} />
         <Route path="/step2" element={<Step2 />} />
         <Route path="/step3" element={<Step3 />} />
