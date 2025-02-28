@@ -21,7 +21,6 @@ const Step4 = () => {
   const [showResults, setShowResults] = useState(false);
   const [lockedPlayers, setLockedPlayers] = useState([]);
 
-  // If no players or colors are set, redirect back
   useEffect(() => {
     if (!players || players.length === 0) {
       navigate("/step1");
@@ -32,13 +31,11 @@ const Step4 = () => {
     }
   }, [players, selectedColors, navigate]);
 
-  // Timer countdown
   useEffect(() => {
     if (timeLeft <= 0) {
       endGame();
       return;
     }
-
     const timer = setTimeout(() => {
       setTimeLeft(timeLeft - 1);
     }, 1000);
@@ -60,17 +57,14 @@ const Step4 = () => {
     }
 
     setLockedPlayers([...lockedPlayers, playerIndex]);
-    // toast.success(`${players[playerIndex].name} locked in their color!`);
   };
 
   const endGame = () => {
     setGameEnded(true);
-    // Select random winning color from our selected colors
     const randomIndex = Math.floor(Math.random() * selectedColors.length);
     const winningColorValue = selectedColors[randomIndex];
     setWinningColor(winningColorValue);
 
-    // Wait a moment before showing results
     setTimeout(() => {
       setShowResults(true);
     }, 1000);
@@ -89,7 +83,6 @@ const Step4 = () => {
     navigate("/");
   };
 
-  // Determine winners
   const winners = showResults
     ? players.filter(
         (player, index) =>
@@ -97,20 +90,9 @@ const Step4 = () => {
       )
     : [];
 
-  // Responsive player layout based on number of players and screen size
   const getPlayerLayout = () => {
-    // For mobile view
-    if (window.innerWidth < 768) {
-      return (
-        <div className="w-full px-4 max-w-md mx-auto mt-24 mb-20 flex flex-col gap-4">
-          {players.map((player, index) => renderPlayerBox(player, index))}
-        </div>
-      );
-    }
-
-    // For desktop view - position players in a pattern
     return (
-      <>
+      <div className="absolute inset-0">
         {players.map((player, index) => {
           const position = getDesktopPosition(index, players.length);
           return (
@@ -119,61 +101,42 @@ const Step4 = () => {
             </div>
           );
         })}
-      </>
+      </div>
     );
   };
 
-  // Get desktop position classes based on player index and total players
   const getDesktopPosition = (index, totalPlayers) => {
     switch (totalPlayers) {
       case 1:
-        return "bottom-4 left-1/2 transform -translate-x-1/2 md:bottom-10";
+        return "bottom-4 left-1/2 transform -translate-x-1/2 ";
       case 2:
         return index === 0
-          ? "top-24 left-1/2 transform -translate-x-1/2 md:top-10"
-          : "bottom-4 left-1/2 transform -translate-x-1/2 md:bottom-10";
+          ? "top-25 left-0 md:left-10" // Player 1: Left alignment
+          : "top-25 right-0 md:right-10"; // Player 2: Right alignment
       case 3:
-        if (index === 0)
-          return "top-24 left-1/4 transform -translate-x-1/2 md:top-10 md:left-10";
-        if (index === 1)
-          return "top-24 right-1/4 transform translate-x-1/2 md:top-10 md:right-10";
-        return "bottom-4 left-1/2 transform -translate-x-1/2 md:bottom-10";
+        if (index === 0) return "top-25 left-0 md:left-1/4";
+        if (index === 1) return "top-25 right-0 md:right-1/4";
+        return "bottom-4 left-1/2 transform -translate-x-1/2";
       case 4:
-        if (index === 0)
-          return "top-24 left-1/4 transform -translate-x-1/2 md:top-10 md:left-10";
-        if (index === 1)
-          return "top-24 right-1/4 transform translate-x-1/2 md:top-10 md:right-10";
-        if (index === 2)
-          return "bottom-4 left-1/4 transform -translate-x-1/2 md:bottom-10 md:left-10";
-        return "bottom-4 right-1/4 transform translate-x-1/2 md:bottom-10 md:right-10";
+        if (index === 0) return "top-25 left-0 md:left-10";
+        if (index === 1) return "top-25 right-0 md:right-10";
+        if (index === 2) return "bottom-10 left-0 md:left-10";
+        return "bottom-10 right-0 md:right-10";
       default:
         return "";
     }
   };
 
-  // Render an individual player box
   const renderPlayerBox = (player, index) => (
-    <div className="bg-gray-800 rounded-xl shadow-xl border border-gray-700 p-4 w-full max-w-xs mx-auto transition-all">
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-          {player.name}
-        </h3>
-
-        {/* Status indicator */}
-        {showResults && (
-          <div
-            className={`w-6 h-6 rounded-full ${
-              winners.includes(player) ? "bg-green-500" : "bg-red-500"
-            }`}
-          ></div>
-        )}
-      </div>
-
+    <div className="bg-gray-800 rounded-xl shadow-xl border border-gray-700 p-4 w-40 md:w-48 text-center transition-all">
+      <h3 className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+        {player.name}
+      </h3>
       <select
         value={player.color}
         onChange={(e) => updatePlayerColor(index, e.target.value)}
         disabled={lockedPlayers.includes(index) || gameEnded}
-        className="w-full p-2 border rounded mb-2 bg-gray-700 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+        className="w-full p-2 border rounded mb-2 bg-gray-700 text-white border-gray-600"
       >
         <option value="">Select a color</option>
         {selectedColors.map((color, i) => (
@@ -189,7 +152,7 @@ const Step4 = () => {
         className={`w-full py-2 rounded-lg font-bold transition transform hover:scale-105 ${
           lockedPlayers.includes(index)
             ? "bg-gray-600 cursor-not-allowed text-gray-400"
-            : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+            : "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
         }`}
       >
         {lockedPlayers.includes(index) ? "Locked" : "Lock Color"}
@@ -200,12 +163,8 @@ const Step4 = () => {
   return (
     <div className="min-h-screen pt-16 relative bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white flex justify-center items-center overflow-hidden">
       <Navbar />
-      {/* main box where countdown will be shown and also reult color shown */}
-
-      {/* Responsive container */}
-      <div className="w-full relative flex flex-col items-center">
-        {/* Center timer/result box */}
-        <div className="z-10 bg-gray-800 rounded-xl shadow-xl border border-gray-700 p-4 md:p-6 w-64 h-64 flex flex-col justify-center items-center mb-4 md:mb-0">
+      <div className="w-full relative flex flex-col items-center ">
+        <div className="z-10 bg-gray-800  rounded-xl shadow-xl border border-gray-700 p-4 md:p-6 w-64 h-64 flex flex-col justify-center items-center mb-4 md:mb-0">
           {!gameEnded ? (
             <>
               <h3 className="text-xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
@@ -222,19 +181,14 @@ const Step4 = () => {
                 Winning Color
               </h3>
               <div
-                className="w-24 h-24 rounded-full border-4 border-gray-600"
+                className="w-24 h-24 rounded-full"
                 style={{ backgroundColor: winningColor?.value }}
               ></div>
-              <p className="mt-2 font-bold text-gray-200">
-                {winningColor?.name}
-              </p>
             </>
           )}
         </div>
-
-        {/* Responsive player layout */}
-        {getPlayerLayout()}
       </div>
+      <div className="">{getPlayerLayout()}</div>
 
       {/* Results popup */}
       {showResults && (
