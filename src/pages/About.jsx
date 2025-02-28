@@ -82,6 +82,41 @@ const About = () => {
             </div>
           </div>
         </div>
+        <div className="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
+          <h2 className="text-2xl font-bold mb-4 text-purple-400">
+            Game Features
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="font-bold text-lg mb-2 text-blue-300">
+                Multi-player Support
+              </h3>
+              <p>Play with up to 4 friends on the same device!</p>
+            </div>
+
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="font-bold text-lg mb-2 text-blue-300">
+                Customizable Colors
+              </h3>
+              <p>Choose from 10 vibrant colors to include in your game.</p>
+            </div>
+
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="font-bold text-lg mb-2 text-blue-300">
+                Quick Rounds
+              </h3>
+              <p>Fast-paced 10-second rounds keep the excitement high!</p>
+            </div>
+
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="font-bold text-lg mb-2 text-blue-300">
+                No Account Needed
+              </h3>
+              <p>Jump right into the fun - no login or signup required.</p>
+            </div>
+          </div>
+        </div>
 
         <div className="bg-gray-800 rounded-lg shadow-xl p-6 mb-8 border border-gray-700">
           <h2 className="text-2xl font-bold mb-4 text-yellow-400">
