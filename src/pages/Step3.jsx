@@ -1,81 +1,81 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useGameStore from '../store/useGameStore';
 
-const colors = [
-  { id: 1, hex: '#FF0000', name: 'Red' },
-  { id: 2, hex: '#00FF00', name: 'Green' },
-  { id: 3, hex: '#0000FF', name: 'Blue' },
-  { id: 4, hex: '#FFFF00', name: 'Yellow' },
-  { id: 5, hex: '#FF00FF', name: 'Magenta' },
-  { id: 6, hex: '#00FFFF', name: 'Cyan' },
-  { id: 7, hex: '#FFA500', name: 'Orange' },
-  { id: 8, hex: '#800080', name: 'Purple' },
-  { id: 9, hex: '#008080', name: 'Teal' },
-  { id: 10, hex: '#FFC0CB', name: 'Pink' }
-];
-
 const Step3 = () => {
   const navigate = useNavigate();
-  const { selectedColors, setSelectedColors, setCurrentStep } = useGameStore();
-  const [selected, setSelected] = useState([]);
+  const { players, availableColors, setSelectedColors } = useGameStore();
+  const [selectedColorIds, setSelectedColorIds] = useState([0, 1, 2, 3, 4]); // Default 5 colors selected
 
+  // If no players are set, redirect back to Step1
   useEffect(() => {
-    // Set default selection for the first 5 colors
-    if (selectedColors.length === 0) {
-      const defaultSelection = colors.slice(0, 5).map(c => c.hex);
-      setSelected(defaultSelection);
-    } else {
-      setSelected(selectedColors);
+    if (!players || players.length === 0) {
+      navigate('/step1');
     }
-  }, [selectedColors]);
+  }, [players, navigate]);
 
-  const handleColorSelect = (color) => {
-    if (selected.includes(color)) {
-      setSelected(selected.filter(c => c !== color));
+  const handleColorToggle = (index) => {
+    if (selectedColorIds.includes(index)) {
+      // Only remove if we'll still have at least 5 colors
+      if (selectedColorIds.length > 5) {
+        setSelectedColorIds(selectedColorIds.filter(id => id !== index));
+      } else {
+        toast.info('You must select at least 5 colors');
+      }
     } else {
-      setSelected([...selected, color]);
+      // Only add if we'll have at most 10 colors
+      if (selectedColorIds.length < 10) {
+        setSelectedColorIds([...selectedColorIds, index]);
+      } else {
+        toast.info('You can select a maximum of 10 colors');
+      }
     }
   };
 
   const handleNext = () => {
-    if (selected.length < 5) {
-      toast.error('Select at least 5 colors.');
+    if (selectedColorIds.length < 5) {
+      toast.error('Please select at least 5 colors');
       return;
     }
-    setSelectedColors(selected);
-    setCurrentStep(4);
+    
+    const selectedColors = selectedColorIds.map(id => availableColors[id]);
+    setSelectedColors(selectedColors);
     navigate('/step4');
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
-      <h2 className="text-3xl font-bold mb-4">Select Colors</h2>
-      <p className="mb-4">Choose at least 5 colors for the game:</p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-        {colors.map((color) => (
-          <label key={color.id} className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              value={color.hex}
-              checked={selected.includes(color.hex)}
-              onChange={() => handleColorSelect(color.hex)}
-              className="form-checkbox h-5 w-5 text-indigo-600"
-            />
-            <div
-              className="w-10 h-10 rounded-full"
-              style={{ backgroundColor: color.hex }}
+      <h2 className="text-3xl font-bold mb-6">Select Colors (Minimum 5)</h2>
+      
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mb-6">
+        {availableColors.map((color, index) => (
+          <div 
+            key={index}
+            onClick={() => handleColorToggle(index)}
+            className={`
+              cursor-pointer border-2 p-4 rounded-lg flex flex-col items-center transition-all
+              ${selectedColorIds.includes(index) ? 'border-black scale-105' : 'border-gray-300 opacity-70'}
+            `}
+          >
+            <div 
+              className="w-16 h-16 rounded-full mb-2" 
+              style={{ backgroundColor: color.value }}
             ></div>
             <span>{color.name}</span>
-          </label>
+          </div>
         ))}
       </div>
+      
+      <div className="text-center mb-4">
+        {selectedColorIds.length} of 10 colors selected
+      </div>
+      
       <button
         onClick={handleNext}
         className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
       >
-        Next
+        Start Game
       </button>
     </div>
   );

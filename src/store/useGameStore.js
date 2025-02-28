@@ -1,37 +1,45 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-const useGameStore = create(persist(
-  (set) => ({
-    // Game Flow
-    currentStep: 1,
-    
-    // Game Data
+const useGameStore = create((set) => ({
+  players: [],
+  selectedColors: [],
+  availableColors: [
+    { name: 'Red', value: '#FF0000' },
+    { name: 'Blue', value: '#0000FF' },
+    { name: 'Green', value: '#00FF00' },
+    { name: 'Yellow', value: '#FFFF00' },
+    { name: 'Purple', value: '#800080' },
+    { name: 'Orange', value: '#FFA500' },
+    { name: 'Pink', value: '#FFC0CB' },
+    { name: 'Brown', value: '#A52A2A' },
+    { name: 'Black', value: '#000000' },
+    { name: 'White', value: '#FFFFFF' }
+  ],
+  winningColor: null,
+  
+  // Methods to update state
+  setPlayers: (players) => set({ players }),
+  updatePlayerName: (index, name) => set((state) => {
+    const updatedPlayers = [...state.players];
+    updatedPlayers[index].name = name;
+    return { players: updatedPlayers };
+  }),
+  setSelectedColors: (colors) => set({ selectedColors: colors }),
+  updatePlayerColor: (index, color) => set((state) => {
+    const updatedPlayers = [...state.players];
+    updatedPlayers[index].color = color;
+    return { players: updatedPlayers };
+  }),
+  setWinningColor: (color) => set({ winningColor: color }),
+  resetGame: () => set((state) => ({
+    winningColor: null,
+    players: state.players.map(player => ({ ...player, color: '' }))
+  })),
+  clearAll: () => set({
     players: [],
     selectedColors: [],
-    winner: null,
-    
-    // Actions
-    setCurrentStep: (step) => set({ currentStep: step }),
-    setPlayers: (players) => set({ players }),
-    setSelectedColors: (colors) => set({ selectedColors: colors }),
-    setWinner: (winner) => set({ winner }),
-    resetGame: () => set({ 
-      currentStep: 1, 
-      players: [], 
-      selectedColors: [], 
-      winner: null 
-    }),
-  }),
-  {
-    name: "game-storage", // Name in localStorage
-    partialize: (state) => ({
-      currentStep: state.currentStep,
-      players: state.players,
-      selectedColors: state.selectedColors,
-      winner: state.winner,
-    })
-  }
-));
+    winningColor: null
+  })
+}));
 
 export default useGameStore;
